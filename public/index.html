@@ -1,64 +1,44 @@
 <!doctype html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <title>FullTask AI Tutor — v6.7</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="stylesheet" href="/style.css" />
+  <meta charset="utf-8"/>
+  <title>FullTask AI Tutor v6.7</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link rel="stylesheet" href="/style.css"/>
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>FullTask AI Tutor <small>v6.7</small></h1>
-      <div class="meta">By: Akin S. Sokpah (Liberia)</div>
-    </header>
+    <header><h1>FullTask AI Tutor</h1><small>v6.7</small></header>
+    <div class="meta">By Akin S. Sokpah (Liberia)</div>
 
-    <section class="controls">
+    <div class="controls">
       <select id="subject">
-        <option>General</option>
-        <option>Mathematics</option>
-        <option>Physics</option>
-        <option>Chemistry</option>
-        <option>Biology</option>
-        <option>Nursing</option>
-        <option>English</option>
+        <option>General</option><option>Mathematics</option><option>Physics</option>
       </select>
-
       <select id="mode">
-        <option value="concise">Concise</option>
-        <option value="deep">Deep</option>
+        <option value="concise">Concise</option><option value="deep">Deep</option>
       </select>
-
       <select id="tone">
-        <option value="teaching">Teaching</option>
-        <option value="friendly">Friendly</option>
-        <option value="formal">Formal</option>
-        <option value="quick">Quick</option>
+        <option value="teaching">Teaching</option><option value="friendly">Friendly</option>
       </select>
-
       <button id="toggleStream">Streaming: OFF</button>
+      <button id="signIn">Sign in With Google</button>
+      <button id="signOut">Logout</button>
+      <span id="userDisplay">Not logged in</span>
+    </div>
 
-      <div class="auth">
-        <button id="signIn">Sign in With Google</button>
-        <button id="signOut">Logout</button>
-        <span id="userDisplay">Not logged in</span>
-      </div>
-    </section>
+    <div id="chat" class="chat"></div>
 
-    <section id="chat" class="chat" aria-live="polite"></section>
-
-    <section class="composer">
-      <textarea id="input" placeholder="Ask anything..."></textarea>
+    <div class="composer">
+      <textarea id="input" placeholder="Ask anything…"></textarea>
       <div class="actions">
         <button id="send">Send</button>
         <button id="quiz">Generate Quiz</button>
         <button id="flash">Flashcards</button>
         <button id="uploadBtn">Upload PDF</button>
-        <input id="file" type="file" style="display:none" />
+        <input id="fileInput" type="file" style="display:none"/>
       </div>
-    </section>
-
-    <footer class="small">FullTask AI Tutor — created by Akin S. Sokpah from Liberia</footer>
+    </div>
   </div>
 
   <script type="module" src="/app.js"></script>
