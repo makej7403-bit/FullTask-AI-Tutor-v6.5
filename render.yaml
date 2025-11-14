@@ -1,12 +1,10 @@
 services:
   - type: web
     name: fulltask-ai-tutor
-    env: node
+    env: docker
     plan: free
     repo: https://github.com/YOUR-USERNAME/YOUR-REPO-NAME
     branch: main
-    buildCommand: npm install
-    startCommand: npm run start
     envVars:
       - key: OPENAI_API_KEY
         fromDatabase: false
