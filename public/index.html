@@ -1,231 +1,66 @@
 <!doctype html>
 <html>
 <head>
-  <meta charset="utf-8"/>
-  <title>FullTask AI Tutor v6.7</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <style>
-    body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial;margin:12px auto;max-width:980px}
-    header{display:flex;justify-content:space-between;align-items:center}
-    #chat{border:1px solid #ddd;padding:12px;border-radius:8px;height:50vh;overflow:auto;background:#fafafa}
-    .msg{margin:8px 0;padding:10px;border-radius:8px;white-space:pre-wrap}
-    .user{background:#e6f7ff;text-align:right}
-    .bot{background:#fff}
-    .controls{display:flex;gap:8px;margin-bottom:8px;align-items:center}
-    textarea{flex:1;padding:8px;border-radius:6px;border:1px solid #ccc;min-height:60px}
-    button{padding:10px 14px;border-radius:6px;border:none;background:#0b74ff;color:white;cursor:pointer}
-    select{padding:8px;border-radius:6px}
-    #userDisplay{font-size:13px}
-    .mini{font-size:12px;color:#666}
-  </style>
+  <meta charset="utf-8" />
+  <title>FullTask AI Tutor — v6.7</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
-  <header>
-    <h1>FullTask AI Tutor <small style="font-size:14px">v6.7</small></h1>
-    <div class="mini">By: Akin S. Sokpah (Liberia)</div>
-  </header>
+  <div class="container">
+    <header>
+      <h1>FullTask AI Tutor <small>v6.7</small></h1>
+      <div class="meta">By: Akin S. Sokpah (Liberia)</div>
+    </header>
 
-  <div class="controls">
-    <select id="subject"><option>General</option><option>Mathematics</option><option>Physics</option><option>Chemistry</option><option>Biology</option><option>Nursing</option><option>English</option></select>
-    <select id="mode"><option value="concise">Concise</option><option value="deep">Deep</option></select>
-    <select id="tone"><option value="teaching">Teaching</option><option value="formal">Formal</option><option value="friendly">Friendly</option></select>
-    <button id="toggleStreaming">Streaming: OFF</button>
-    <div style="margin-left:auto">
-      <button id="googleSign">Sign in With Google</button>
-      <button id="googleOut">Logout</button>
-      <span id="userDisplay">Not logged in</span>
-    </div>
+    <section class="controls">
+      <select id="subject">
+        <option>General</option>
+        <option>Mathematics</option>
+        <option>Physics</option>
+        <option>Chemistry</option>
+        <option>Biology</option>
+        <option>Nursing</option>
+        <option>English</option>
+      </select>
+
+      <select id="mode">
+        <option value="concise">Concise</option>
+        <option value="deep">Deep</option>
+      </select>
+
+      <select id="tone">
+        <option value="teaching">Teaching</option>
+        <option value="friendly">Friendly</option>
+        <option value="formal">Formal</option>
+        <option value="quick">Quick</option>
+      </select>
+
+      <button id="toggleStream">Streaming: OFF</button>
+
+      <div class="auth">
+        <button id="signIn">Sign in With Google</button>
+        <button id="signOut">Logout</button>
+        <span id="userDisplay">Not logged in</span>
+      </div>
+    </section>
+
+    <section id="chat" class="chat" aria-live="polite"></section>
+
+    <section class="composer">
+      <textarea id="input" placeholder="Ask anything..."></textarea>
+      <div class="actions">
+        <button id="send">Send</button>
+        <button id="quiz">Generate Quiz</button>
+        <button id="flash">Flashcards</button>
+        <button id="uploadBtn">Upload PDF</button>
+        <input id="file" type="file" style="display:none" />
+      </div>
+    </section>
+
+    <footer class="small">FullTask AI Tutor — created by Akin S. Sokpah from Liberia</footer>
   </div>
 
-  <section id="chat" aria-live="polite"></section>
-
-  <div style="margin-top:8px">
-    <textarea id="input" placeholder="Ask anything..."></textarea>
-    <div style="display:flex;gap:8px;margin-top:6px">
-      <button id="send">Send</button>
-      <button id="quiz">Generate Quiz</button>
-      <button id="flash">Flashcards</button>
-      <button id="uploadBtn">Upload PDF</button>
-      <input id="fileInput" type="file" style="display:none"/>
-    </div>
-  </div>
-
-  <!-- Firebase (module) -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-    // Firebase config (user-provided)
-    const firebaseConfig = {
-      apiKey: "AIzaSyC7cAN-mrE2PvmlQ11zLKAdHBhN7nUFjHw",
-      authDomain: "fir-u-c-students-web.firebaseapp.com",
-      databaseURL: "https://fir-u-c-students-web-default-rtdb.firebaseio.com",
-      projectId: "fir-u-c-students-web",
-      storageBucket: "fir-u-c-students-web.firebasestorage.app",
-      messagingSenderId: "113569186739",
-      appId: "1:113569186739:web:d8daf21059f43a79e841c6"
-    };
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
-
-    window.googleSignIn = async () => {
-      try {
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
-        document.getElementById("userDisplay").textContent = user.displayName;
-        const idToken = await user.getIdToken();
-        localStorage.setItem("ft_id_token", idToken);
-      } catch (e) {
-        console.error(e);
-        alert("Google sign-in failed");
-      }
-    };
-    window.googleSignOut = async () => {
-      await signOut(auth);
-      document.getElementById("userDisplay").textContent = "Not logged in";
-      localStorage.removeItem("ft_id_token");
-    };
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        document.getElementById("userDisplay").textContent = user.displayName;
-        user.getIdToken().then(t => localStorage.setItem("ft_id_token", t));
-      } else {
-        document.getElementById("userDisplay").textContent = "Not logged in";
-        localStorage.removeItem("ft_id_token");
-      }
-    });
-
-    // UI
-    const chat = document.getElementById("chat");
-    const input = document.getElementById("input");
-    const send = document.getElementById("send");
-    const subject = document.getElementById("subject");
-    const mode = document.getElementById("mode");
-    const tone = document.getElementById("tone");
-    const streamToggle = document.getElementById("toggleStreaming");
-    const quizBtn = document.getElementById("quiz");
-    const flashBtn = document.getElementById("flash");
-    const fileInput = document.getElementById("fileInput");
-    const uploadBtn = document.getElementById("uploadBtn");
-    const fileReader = new FileReader();
-
-    let streaming = false;
-    streamToggle.onclick = () => {
-      streaming = !streaming;
-      streamToggle.textContent = streaming ? "Streaming: ON" : "Streaming: OFF";
-    };
-
-    function addMessage(text, who="bot") {
-      const el = document.createElement("div");
-      el.className = "msg " + (who === "user" ? "user" : "bot");
-      el.textContent = text;
-      chat.appendChild(el);
-      chat.scrollTop = chat.scrollHeight;
-      return el;
-    }
-
-    async function sendMessage() {
-      const msg = input.value.trim();
-      if (!msg) return;
-      addMessage(msg, "user");
-      input.value = "";
-      const sessionId = localStorage.getItem("ft_session") || ("web-" + Math.random().toString(36).slice(2,9));
-      localStorage.setItem("ft_session", sessionId);
-      const idToken = localStorage.getItem("ft_id_token");
-
-      const payload = { sessionId, subject: subject.value, mode: mode.value, tone: tone.value, message: msg };
-
-      const resEl = addMessage("Thinking...", "bot");
-      try {
-        if (streaming) {
-          // use fetch-based streaming
-          const r = await fetch("/api/stream-fetch", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", ...(idToken ? { "Authorization": "Bearer " + idToken } : {}) },
-            body: JSON.stringify(payload)
-          });
-          if (!r.ok) {
-            const err = await r.json();
-            resEl.textContent = "Error: " + (err.error || JSON.stringify(err));
-            return;
-          }
-          // read stream
-          const reader = r.body.getReader();
-          const decoder = new TextDecoder();
-          resEl.textContent = "";
-          while (true) {
-            const { value, done } = await reader.read();
-            if (done) break;
-            if (value) {
-              // OpenAI streaming chunks can be raw; we just append decoded text
-              const chunk = decoder.decode(value, { stream: true });
-              resEl.textContent += chunk;
-              chat.scrollTop = chat.scrollHeight;
-            }
-          }
-        } else {
-          const r = await fetch("/api/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", ...(idToken ? { "Authorization": "Bearer " + idToken } : {}) },
-            body: JSON.stringify(payload)
-          });
-          const j = await r.json();
-          if (r.ok) resEl.textContent = j.reply || "No reply";
-          else resEl.textContent = "Error: " + (j.error || JSON.stringify(j));
-        }
-      } catch (e) {
-        resEl.textContent = "Network error: " + String(e);
-      }
-    }
-
-    send.addEventListener("click", sendMessage);
-    input.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send.click(); }});
-
-    // Quiz button
-    quizBtn.addEventListener("click", async () => {
-      const topic = prompt("Topic for quiz?");
-      if (!topic) return;
-      const idToken = localStorage.getItem("ft_id_token");
-      const r = await fetch("/api/generate-quiz", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...(idToken ? { "Authorization": "Bearer " + idToken } : {}) },
-        body: JSON.stringify({ topic, count: 5 })
-      });
-      const j = await r.json();
-      if (r.ok && j.quiz) addMessage(JSON.stringify(j.quiz, null, 2), "bot");
-      else addMessage("Quiz error: " + (j.raw || JSON.stringify(j)), "bot");
-    });
-
-    // Flashcards
-    flashBtn.addEventListener("click", async () => {
-      const topic = prompt("Topic for flashcards?");
-      if (!topic) return;
-      const idToken = localStorage.getItem("ft_id_token");
-      const r = await fetch("/api/flashcards", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...(idToken ? { "Authorization": "Bearer " + idToken } : {}) },
-        body: JSON.stringify({ topic, count: 10 })
-      });
-      const j = await r.json();
-      if (r.ok && j.flashcards) addMessage(JSON.stringify(j.flashcards, null, 2), "bot");
-      else addMessage("Flashcards error: " + (j.raw || JSON.stringify(j)), "bot");
-    });
-
-    // Upload
-    uploadBtn.addEventListener("click", () => fileInput.click());
-    fileInput.addEventListener("change", async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const form = new FormData();
-      form.append("file", file);
-      const idToken = localStorage.getItem("ft_id_token");
-      const r = await fetch("/api/upload", { method: "POST", headers: idToken ? { "Authorization": "Bearer " + idToken } : {}, body: form });
-      const j = await r.json();
-      if (r.ok) addMessage("Upload result:\n" + JSON.stringify(j, null, 2), "bot");
-      else addMessage("Upload error: " + JSON.stringify(j), "bot");
-    });
-
-  </script>
+  <script type="module" src="/app.js"></script>
 </body>
 </html>
