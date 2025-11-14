@@ -1,5 +1,6 @@
 node_modules/
-.env
+.next/
+.env.local
 .env.*
 uploads/
 .DS_Store
