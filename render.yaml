@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: fulltask-ai-tutor
+    env: node
+    plan: free
+    repo: https://github.com/YOUR-USERNAME/YOUR-REPO-NAME
+    branch: main
+    buildCommand: npm install
+    startCommand: npm run start
+    envVars:
+      - key: OPENAI_API_KEY
+        fromDatabase: false
+        value: "<<set in dashboard>>"
+      - key: APP_VERSION
+        value: v6.7
+      - key: OWNER_NAME
+        value: "Akin S. Sokpah"
+      - key: OWNER_LOCATION
+        value: "Liberia"
