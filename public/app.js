@@ -106,4 +106,84 @@ async function sendChat() {
       });
       if (!res.ok) {
         const j = await res.json().catch(() => ({}));
-        responseElem.textContent
+        responseElem.textContent = "Error: " + (j.error || res.statusText);
+        return;
+      }
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      responseElem.textContent = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        if (value) {
+          const chunk = decoder.decode(value, { stream: true });
+          try {
+            const obj = JSON.parse(chunk);
+            if (obj.chunk) responseElem.textContent += obj.chunk;
+            else responseElem.textContent += chunk;
+          } catch {
+            responseElem.textContent += chunk;
+          }
+          chatEl.scrollTop = chatEl.scrollHeight;
+        }
+      }
+    } else {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...(idToken ? { "Authorization": "Bearer " + idToken } : {}) },
+        body: JSON.stringify(payload),
+      });
+      const j = await res.json();
+      if (res.ok) responseElem.textContent = j.reply;
+      else responseElem.textContent = "Error: " + (j.error || JSON.stringify(j));
+    }
+  } catch (e) {
+    console.error("Chat error", e);
+    responseElem.textContent = "Network error";
+  }
+}
+
+quizBtn.onclick = async () => {
+  const topic = prompt("Topic for quiz?");
+  if (!topic) return;
+  const idToken = localStorage.getItem("ft_id_token");
+  const res = await fetch("/api/generate-quiz", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...(idToken ? { "Authorization": "Bearer " + idToken } : {}) },
+    body: JSON.stringify({ topic })
+  });
+  const j = await res.json();
+  if (res.ok) addMessage(j.quiz, "bot");
+  else addMessage("Quiz error: " + JSON.stringify(j), "bot");
+};
+
+flashBtn.onclick = async () => {
+  const topic = prompt("Topic for flashcards?");
+  if (!topic) return;
+  const idToken = localStorage.getItem("ft_id_token");
+  const res = await fetch("/api/flashcards", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...(idToken ? { "Authorization": "Bearer " + idToken } : {}) },
+    body: JSON.stringify({ topic })
+  });
+  const j = await res.json();
+  if (res.ok) addMessage(j.flashcards, "bot");
+  else addMessage("Flashcards error: " + JSON.stringify(j), "bot");
+};
+
+uploadBtn.onclick = () => fileInput.click();
+fileInput.onchange = async () => {
+  const file = fileInput.files[0];
+  if (!file) return;
+  const form = new FormData();
+  form.append("file", file);
+  const idToken = localStorage.getItem("ft_id_token");
+  const res = await fetch("/api/upload", {
+    method: "POST",
+    headers: idToken ? { "Authorization": "Bearer " + idToken } : {},
+    body: form
+  });
+  const j = await res.json();
+  if (res.ok) addMessage(`Upload result:\n${JSON.stringify(j, null, 2)}`, "bot");
+  else addMessage("Upload error: " + JSON.stringify(j), "bot");
+};
