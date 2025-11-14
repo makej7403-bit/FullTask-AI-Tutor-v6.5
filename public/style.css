@@ -1,0 +1,18 @@
+:root{--bg:#0f1724;--card:#0b1220;--muted:#9aa4b2;--accent:#0b74ff}
+body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:#f6f8fb;color:#0b1220;margin:0;padding:18px}
+.container{max-width:980px;margin:0 auto}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+header h1{margin:0;font-size:20px}
+.meta{font-size:13px;color:var(--muted)}
+.controls{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.controls select, .controls button{padding:8px;border-radius:8px;border:1px solid #ddd;background:#fff}
+.auth{margin-left:auto;display:flex;gap:8px;align-items:center}
+.chat{border:1px solid #e6e9ef;background:#fff;padding:12px;border-radius:8px;height:48vh;overflow:auto}
+.msg{margin:8px 0;padding:10px;border-radius:8px;white-space:pre-wrap}
+.user{background:#e6f7ff;text-align:right}
+.bot{background:#f3f6fb}
+.composer{display:flex;flex-direction:column;margin-top:10px;gap:8px}
+textarea{min-height:70px;padding:10px;border-radius:8px;border:1px solid #ddd;resize:vertical}
+.actions{display:flex;gap:8px}
+.actions button{padding:10px 12px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer}
+footer.small{font-size:12px;color:var(--muted);margin-top:12px}
