@@ -1,15 +1,23 @@
+# Install Node
 FROM node:18-alpine
 
+# Create app directory
 WORKDIR /app
 
+# Copy package.json
 COPY package*.json ./
 
-RUN npm install --omit=dev
+# Install all dependencies
+RUN npm install
 
+# Copy all project files
 COPY . .
 
-RUN mkdir -p uploads public
+# Expose port
+EXPOSE 3000
 
-EXPOSE 10000
+# Build Next.js
+RUN npm run build
 
-CMD ["node", "server.js"]
+# Run app
+CMD ["npm", "start"]
