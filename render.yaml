@@ -3,7 +3,7 @@ services:
     name: fulltask-ai-tutor
     env: docker
     plan: free
-    repo: https://github.com/YOUR-USERNAME/YOUR-REPO-NAME
+    repo: https://github.com/makej7403-bit/FullTask-AI-Tutor-v6.5
     branch: main
     envVars:
       - key: OPENAI_API_KEY
